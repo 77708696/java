@@ -16,7 +16,7 @@ public class TestMysql {
 			System.out.println(rs.getString("email") + "__" + rs.getInt("id"));
 		}
 		
-		System.out.println("-------------´øÕ¼Î»·û-----------------");
+		System.out.println("-------------æµ‹è¯•æŸ¥è¯¢-----------------");
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		
 		//map.put(1, "hc@qq.com");
