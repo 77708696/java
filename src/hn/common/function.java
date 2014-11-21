@@ -1,6 +1,7 @@
 package hn.common;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 public class function {
@@ -20,5 +21,11 @@ public class function {
 			
 		}
 		return null;
+	}
+	
+	public static void PrintMap(Map<Object, Object> map){
+		for(Object key : map.keySet())
+			System.out.println(key + ":" + map.get(key));
+	
 	}
 }
