@@ -43,6 +43,7 @@ public class TestMysql {
 		function.PrintMap(map);
 		
 		System.out.println(dbHelp.execute(sql,map));
+		System.out.println("huangxiaoming1111111111".hashCode());
 		dbHelp.closeResultSet(rs);
 		
 	}
