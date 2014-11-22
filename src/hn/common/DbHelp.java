@@ -20,26 +20,39 @@ public class DbHelp {
 		return _dbDbHelp;
 	}
 	private DbHelp(){
-		dbConnection = getConnection();
+		 init();
 	}
 	
-
-	private Connection getConnection() {
+	private void  init() {
         Properties props = new Properties();
         FileInputStream fis = null;
         Connection con = null;
         try {
             fis = new FileInputStream(System.getProperty("user.dir") + "/config.properties");
-            props.load(fis);
-            // 加载驱动
-            Class.forName(props.getProperty("DB_DRIVER_CLASS"));
-            // 创建一个连接
-            con = DriverManager.getConnection(props.getProperty("DB_URL"), props.getProperty("DB_USERNAME"), props.getProperty("DB_PASSWORD"));
-        } catch (IOException | SQLException | ClassNotFoundException e) {
+            props.load(fis);            
+            //connection mysql
+            con = getConnection(props.getProperty("DB_URL"), props.getProperty("DB_USERNAME"), props.getProperty("DB_PASSWORD"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        dbConnection = con;
+    }
+	private Connection getConnection(String url,String username,String password){
+	    Connection con = null;
+        try {
+           
+            Class.forName("com.mysql.jdbc.Driver");
+            //connection mysql
+            con = DriverManager.getConnection(url, username, password);
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return con;
-    }
+	}
+	public void ReSet(String url,String username,String password){
+	    dbConnection = getConnection(url,username,password);
+	}
+	
 	public int execute(String sql) throws Exception {
 		PreparedStatement ps = null;
 		ps = dbConnection.prepareStatement(sql);        
@@ -77,7 +90,7 @@ public class DbHelp {
 		
 	}
 	
-	// 关闭Connection
+	// 锟截憋拷Connection
     public void closeConnection(Connection con) {
         if (con != null) {
             try {
@@ -89,7 +102,7 @@ public class DbHelp {
             con = null;
         }
     }
-	// 关闭ResultSet
+	// 锟截憋拷ResultSet
     public void closeResultSet(ResultSet rs) {
         if (rs != null) {
             try {
