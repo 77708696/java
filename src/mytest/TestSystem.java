@@ -3,6 +3,7 @@ package mytest;
 import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.LogLog;
 public class TestSystem {
+    //http://ifeve.com/selectors/
     private static final Logger LOGGER = Logger.getLogger(TestSystem.class);
     public static void main(String[] args) {
         LOGGER.info("===============================================");
