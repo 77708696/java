@@ -5,6 +5,7 @@ public class TestCobar {
 
     public static void main(String[] args) throws Exception {
         /**
+         * http://blog.csdn.net/wxwzy738/article/details/17265577  Cobar java 客户端测试
          * 其次，我们也需要注意Cobar的功能约束：
          * https://github.com/alibaba/cobar
 https://github.com/alibaba/cobar/wiki/常见问

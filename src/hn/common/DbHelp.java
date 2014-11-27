@@ -19,7 +19,7 @@ public class DbHelp {
 			_dbDbHelp = new DbHelp();
 		return _dbDbHelp;
 	}
-	private DbHelp(){
+	public DbHelp(){
 		 init();
 	}
 	
