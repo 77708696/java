@@ -9,7 +9,7 @@ public class TestPost implements Runnable {
 
 	public void run() {
 		try{
-			HttpClient hcClient = new HttpClient("http://localhost/oradtdev/web/app_dev.php/document");	
+			HttpClient hcClient = new HttpClient("http://localhost/web/app_dev.php/document");	
 			for(int i=0;i<30;i++){
 				System.out.println("===========" + Thread.currentThread().getName() + "");
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -36,11 +36,11 @@ public class TestPost implements Runnable {
 		
 		System.out.println("===========创建联系人==========");
 		try{
-			HttpClient hcClient = new HttpClient("http://localhost/oradtdev/web/app_dev.php/contact");	
+			HttpClient hcClient = new HttpClient("http://localhost/web/app_dev.php/contact");	
 			for(int i=0;i<30;i++){
 				
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add( new UriNameValuePair("contact", "新联系人" ) );
+				params.add( new UriNameValuePair("contact", "aaa" ) );
 				params.add( new UriNameValuePair("self","true"));
 				hcClient.SetParams(params);
 				hcClient.SetHeader("accesstoken", "aaaaa");
