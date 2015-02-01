@@ -2,3 +2,51 @@ http://www.ibm.com/developerworks/cn/java/j-lo-ant-eclipse/
 http://blog.csdn.net/lujar/article/details/1549478
 
 http://ant.apache.org/bindownload.cgi 下载
+
+<?xml version="1.0"?>
+   <!--定义project文件的文件名与默认执行目标-->
+   <project default="dist" name="Socket Client">
+     <!--添加描述-->
+     <description>A simple Java project</description>
+     <!--添加属性,相当于文件级的全局变量,此处用于设置目录名称-->
+     <property name="srcDir" location="src" />
+     <property name="buildDir" location="build" />
+   	  <property name="build.classes" value="${buildDir}/classes" />
+     <property name="distDir" location="dist" />
+
+     <!--创建目标,操作为创建文件夹-->
+   <target name="init">
+         <tstamp />
+         <mkdir dir="${buildDir}" />
+   	     <mkdir dir="${build.classes}" />
+         <mkdir dir="${distDir}" />
+   </target>
+   <!--创建目标compile,操作为编译src目录下的.java文件并输出.class文件到build目录-->
+   <target name="compile" depends="init">
+   	<javac
+   	                  srcdir="${srcDir}"
+   	                  destdir="${build.classes}"
+   	                  deprecation="true"
+   	                  failonerror="true" debug="true" includeantruntime="on" classpath="../lib/mina-core-2.0.9.jar">
+   	            </javac>
+   </target>
+   <!--创建目标dist,操作为打包.class文件并输出到dist目录,打包.java文件并输出到dist目录-->
+   <target name="dist" depends="compile">
+      <jar destfile="${distDir}/example-${DSTAMP}.jar" basedir="${build.classes}">
+                  <!--创建清单-->
+                 <manifest>
+                          <attribute name="Built-By" value="${user.name}" />
+                 	      <attribute name="Class-Path" value="../lib/mina-core-2.0.9.jar ../lib/slf4j-api-1.7.7.jar ../lib/slf4j-nop-1.7.10.jar"/>
+                          <attribute name="Main-Class" value="example_socket_client.Main" />
+                 </manifest>
+            </jar>
+
+            <jar destfile="${distDir}/package-src-${DSTAMP}.jar" basedir="${srcDir}" />
+      </target>
+      <!--创建目标clean,操作为清空build与dist目录-->
+      <target name="clean">
+                   <_delete dir="${buildDir}" />
+                   <_delete dir="${distDir}" />
+      </target>
+ 
+      </project>
