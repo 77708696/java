@@ -164,3 +164,161 @@ mail to:hot13399@163.com
 </project>
 
  
+
+
+
+工作以前没有学习过ant，工作之后一般使用maven，不过还是有很多的开源框架使用ant构建，所以今天花了半天时间学习了一下，有了下面的入门例子，做了详细解释。
+ 
+ 
+Xml代码  收藏代码
+<?xml version="1.0" encoding="UTF-8"?>  
+<!--   
+    default 默认执行名为compile的任务  
+    basedir 指定基于哪个路径,默认为当前路径（这里显示指明为当前路径）  
+-->  
+<project default="dist" basedir=".">  
+    <!-- properties -->  
+    <!--   
+        标签属性  
+        name : 属性名, ${属性名}则可引用该属性值  
+        value : 属性值, 占位符${属性名}的替换类似C语言的宏  
+        标签属性值  
+        src.dir      源文件目录  
+        classes.dir 本项目字节码文件目录  
+        lib.dir     本项目源码依赖的jar包目录  
+        compile.dir     使用ant编译源文件后的输出目录  
+        dist.dir    打包后的输出目录  
+    -->  
+    <property name = "src.dir" value="src"></property>  
+    <property name = "classes.dir" value="bin"></property>  
+    <property name = "lib.dir" value="lib"></property>  
+    <property name = "compile.dir" value="compile"></property>  
+    <property name = "dist.dir" value="dist"></property>  
+  
+    <!-- classpath -->  
+    <!--建立一个id为lib.jar.classpath的类加载路径-->  
+    <path id="lib.jar.classpath">  
+        <!-- ${lib.dir}目录下的所有jar文件 -->  
+        <fileset file="${lib.dir}/*.jar"></fileset>  
+        <!-- 如果要包含单个路径，使用 pathelement标签（演示） -->  
+        <pathelement location="${classes.dir}"></pathelement>  
+    </path>  
+  
+  
+    <!-- target 新建输出目录 -->  
+    <target name="createOutputFolder">  
+        <mkdir dir="${compile.dir}"/>  
+    </target>  
+  
+    <!-- target 清除源文件编码为utf8的bom头 -->  
+    <!-- 例如使用记事本另存为utf8的时候，前三个字节为特定的标识 ,这三个字节影响ant编译java文件-->  
+    <!-- 如果使用eclipse创建一个utf8格式的java文件则无 -->  
+    <target name="removeUTF8Bom">  
+        <echo>开始移utf8编码文件的bom头</echo>  
+        <!--  
+            dir         <java dir="bin"> 指定java命令当前目录（如果这里设置了则不需设置classpath）  
+                        先从当前目录找字节码文件，没有的话再从classpath找嘛  
+            classname   指定main方法的所在的类  
+            fork        官方：if enabled triggers the class execution in another VM  
+                        可以理解为是否允许启用另一个进程（另一个虚拟机）来执行字节码  
+            maxmemory   指定虚拟机内存  
+            <classpath>   加载该类对应的字节码文件  
+            <arg>     Utf8BomRemover类的main方法需要两个参数，源文件目录的父目录 以及 源文件目录  
+                line    参数的形式类似命令行的输入方式  
+                    ${basedir} 相当于<project>中的 basedir属性值   
+              
+        -->  
+        <java classname="com.yong.util.Utf8BomRemover"   
+            failonerror="true" fork="true" maxmemory="128m">  
+            <classpath location="${classes.dir}" />  
+            <arg line="${basedir}  ${src.dir}" />  
+        </java>  
+    </target>  
+  
+    <!-- target 编译源码，依赖以上两个任务  
+        depends ：执行该任务时，先依次执行依赖的任务，  
+                如果执行过程中，发现被依赖的任务已经执行过则跳过  
+     -->  
+    <target name="compile" depends="removeUTF8Bom, createOutputFolder">  
+        <!-- javac标签用于编译操作  
+            标签属性  
+            srcdir : 指定源代码所在目录  
+            encoding ：指定源码的编码（如果不是使用utf编码，则无需执行removeUTF8Bom任务）  
+            debug : 是否生成调试信息(例如 堆栈异常信息中的行号、栈帧中的局部变量信息以及class名字等)  
+            debuglevel ：指定生成哪些调试信息（下文详解）  
+            destdir　：指定编译文件输出目录（如果不指定则每个字节码文件跟对应的源文件在同一目录）  
+            includeantruntime ：指出是否应在类路径中包括 Ant运行时程序库，默认为 true（不显示设置跑不过，费解）  
+            <classpath> ：使用引用的方式，指定类加载路径(本例为源码依赖的jar包的路径)  
+                        （也可以设置<javac classpathref="lib.jar.classpath" />）  
+        -->  
+        <javac srcdir="${src.dir}" encoding="utf-8" debug="true"   
+            debuglevel="lines, vars, source" destdir="${compile.dir}"  includeantruntime="true" >  
+            <classpath refid="lib.jar.classpath"></classpath>  
+        </javac>  
+    <!--  
+    javac命令与调试信息相关的的一些参数：   
+        无       默认的话，只写入源码的行号和源文件信息  
+        -g      在class文件中生成所有调试信息，包括局部变量的信息  
+        -g:none 不生成任何调试信息。   
+        -g:([lines[,vars[,source]]]) 不确定是使用中括号（）还是花括号{}还是都行  
+             lines: 行号调试信息  
+                将源文件中的行号信息写到Class文件中，此属性用于在Class文件中生成方法字节码流偏移量和源代码行号之间的映射关系。  
+                如果我们不指定此属性的话，我们将在堆栈异常信息中看不到打印的行号。   
+                （没有了行号，你就不能打断点了）  
+             vars: 局部变量调试信息  
+                属性建立了方法的栈帧中局部变量部分内容与源代码中局部变量名称和描述符之间的映射关系。  
+                有了这个属性，调试时，我们才可以看到变量的值。   
+                (没有了局部变量，你调试的时候就看不到，很多框架的class文件都没有写入这个  
+                所以经常遇到调试的时候看不到局部变量的值)  
+             source：源文件调试信息  
+                编译时指定了这个属性，会把源文件的属性信息如源文件名称写入class文件。   
+                （调试的时候遇到Unknown Source这样的信息，通常编译时没有指定source，  
+                在IDE中也可以显示的指定字节码对应的src）  
+                  
+    eclipse中调试源码通常都包含以上三种信息，可以通过。。设置是否包含哪些调试信息  
+        Window->Preferences->Java->Compiler，可以看到页面的下方有一个Classfile Generation，默认是四个选项都选的。  
+          
+    对于ant中<java debug="true" debuglevel="lines, vars, source">  
+        debug 如果为true，则加入的调试信息参考debuglevel， 如果debuglevel没有（我猜就是按照默认的只写入源码的行号和源文件信息）  
+        debug 如果为false， 则不加入调试信息  
+    -->  
+    </target>  
+      
+    <!-- target 创建发布目录（打包的jar包所在目录）-->  
+    <target name="createDistFolder" >  
+        <mkdir dir="${dist.dir}"/>  
+    </target>  
+      
+    <!-- target 打包  
+        destfile    指定打包后生成的jar的路径  
+        basedir     指定打包的字节码文件所在目录  
+          
+        例如有  basedir/com/yong/Test.class  
+        打包后为  destfile/package.jar (/com/yong/Test.class)  
+    -->  
+    <!--  
+        <manifest>标签  ant默认会为该package.jar创建清单文件  
+        如果想要设置清单文件中的一些内容（属性），则要在<jar>里面使用该标签  
+        Main-Class  实行该jar的入口(如果需要双击运行或者命令行中运行)  
+          
+        最终生成的清单文件 /Meta-INF/MANIFEST.MF  
+        Manifest-Version: 1.0  
+        Ant-Version: Apache Ant 1.8.2  
+        Created-By: 1.6.0_32-b05 (Sun Microsystems Inc.)  
+        Built-By: 123  
+        Main-Class: com.yong.FileLineSorter  
+    -->  
+    <target name="dist" depends="createDistFolder, compile">  
+        <!-- 在target下使用时间戳  
+            ${DSTAMP} 表示当天日期 20120725  
+         -->  
+        <tstamp></tstamp>  
+        <jar destfile="${dist.dir}/package-${DSTAMP}.jar" basedir="${compile.dir}">  
+            <manifest>  
+                <attribute name="Built-By" value="${user.name}"/>  
+                <attribute name="Main-Class" value="com.yong.FileLineSorter"/>  
+            </manifest>  
+        </jar>  
+    </target>  
+      
+</project>  
